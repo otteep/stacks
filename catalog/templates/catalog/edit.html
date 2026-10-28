@@ -1,0 +1,40 @@
+{% extends "catalog/base.html" %}
+{% block title %}{% if creating %}Add manually{% else %}Edit{% endif %} · Stacks{% endblock %}
+{% block content %}
+<section class="narrow">
+  <h1>{% if creating %}Add a book manually{% else %}Edit “{{ book.title }}”{% endif %}</h1>
+
+  <form method="post" enctype="multipart/form-data" class="stack">
+    {% csrf_token %}
+
+    <fieldset>
+      <legend>The book{% if not creating %} <small>(shared by all copies of this edition)</small>{% endif %}</legend>
+      {% for field in book_form %}
+      <label>{{ field.label }}
+        {{ field }}
+        {% if field.help_text %}<span class="hint">{{ field.help_text }}</span>{% endif %}
+        {% for error in field.errors %}<span class="error">{{ error }}</span>{% endfor %}
+      </label>
+      {% endfor %}
+    </fieldset>
+
+    <fieldset>
+      <legend>Your copy</legend>
+      {% for field in copy_form %}
+      <label>{{ field.label }}
+        {{ field }}
+        {% if field.help_text %}<span class="hint">{{ field.help_text }}</span>{% endif %}
+        {% for error in field.errors %}<span class="error">{{ error }}</span>{% endfor %}
+      </label>
+      {% endfor %}
+      <datalist id="location-options">{% for loc in locations %}<option value="{{ loc }}">{% endfor %}</datalist>
+      <datalist id="tag-options">{% for t in all_tags %}<option value="{{ t.name }}">{% endfor %}</datalist>
+    </fieldset>
+
+    <div class="actions">
+      <button type="submit" class="primary">Save</button>
+      <a class="button" href="{% if creating %}{% url 'library' %}{% else %}{% url 'copy_detail' copy.pk %}{% endif %}">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

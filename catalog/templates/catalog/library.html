@@ -1,0 +1,62 @@
+{% extends "catalog/base.html" %}
+{% block title %}Library · Stacks{% endblock %}
+{% block content %}
+<form id="filters" class="filters" method="get" action="{% url 'library' %}"
+      hx-get="{% url 'library' %}" hx-target="#results" hx-push-url="true"
+      hx-trigger="input changed delay:250ms from:#q, change from:select, submit">
+  <input id="q" type="search" name="q" value="{{ params.q }}" placeholder="Search title, author, publisher, ISBN, notes…"
+         aria-label="Search" autocomplete="off">
+  <div class="filter-row">
+    <label>Sort
+      <select name="sort">
+        {% for key, label in sorts %}<option value="{{ key }}" {% if key == sort %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Order
+      <select name="dir">
+        <option value="asc" {% if direction == 'asc' %}selected{% endif %}>Ascending</option>
+        <option value="desc" {% if direction == 'desc' %}selected{% endif %}>Descending</option>
+      </select>
+    </label>
+    <label>Location
+      <select name="location">
+        <option value="">All</option>
+        {% for loc in locations %}<option value="{{ loc }}" {% if loc == params.location %}selected{% endif %}>{{ loc }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Format
+      <select name="format">
+        <option value="">All</option>
+        {% for value, label in formats %}<option value="{{ value }}" {% if value == params.format %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Condition
+      <select name="condition">
+        <option value="">All</option>
+        {% for value, label in conditions %}<option value="{{ value }}" {% if value == params.condition %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    {% if tags %}
+    <label>Tag
+      <select name="tag">
+        <option value="">All</option>
+        {% for t in tags %}<option value="{{ t.name }}" {% if t.name == params.tag %}selected{% endif %}>{{ t.name }}</option>{% endfor %}
+      </select>
+    </label>
+    {% endif %}
+    <label>View
+      <select name="view">
+        <option value="list" {% if view_mode == 'list' %}selected{% endif %}>List</option>
+        <option value="grid" {% if view_mode == 'grid' %}selected{% endif %}>Covers</option>
+      </select>
+    </label>
+  </div>
+  <noscript><button type="submit">Apply</button></noscript>
+</form>
+
+{% if review_count %}
+<p class="notice"><a href="{% url 'review' %}">{{ review_count }} book{{ review_count|pluralize }} need a quick check →</a></p>
+{% endif %}
+
+<div id="results">{% include "catalog/_results.html" %}</div>
+{% endblock %}

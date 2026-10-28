@@ -1,0 +1,42 @@
+<p class="count" aria-live="polite">
+  {{ total }} cop{{ total|pluralize:"y,ies" }}{% if params.q or params.location or params.format or params.condition or params.tag %} match{{ total|pluralize:"es," }}{% endif %}
+  {% if total %}· <a href="{% url 'export' %}?{{ querystring }}">Export CSV</a>{% endif %}
+</p>
+
+{% if page.object_list %}
+<ul class="books {{ view_mode }}">
+  {% for copy in page.object_list %}
+  <li>
+    <a class="book-link" href="{% url 'copy_detail' copy.pk %}">
+      {% include "catalog/_cover.html" with book=copy.book thumb=True %}
+      <div class="meta">
+        <span class="title">{{ copy.book.title }}</span>
+        {% if copy.book.authors %}<span class="author">{{ copy.book.authors }}</span>{% endif %}
+        <span class="details">
+          {% if copy.book.published_year %}{{ copy.book.published_year }}{% endif %}
+          {% if copy.format %}· {{ copy.get_format_display }}{% endif %}
+          {% if copy.location %}· {{ copy.location }}{% endif %}
+        </span>
+      </div>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+
+{% if page.has_other_pages %}
+<nav class="pager" aria-label="Pages">
+  {% if page.has_previous %}<a href="?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page.previous_page_number }}">← Previous</a>{% else %}<span></span>{% endif %}
+  <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a href="?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page.next_page_number }}">Next →</a>{% else %}<span></span>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<div class="empty">
+  {% if params.q or params.location or params.format or params.condition or params.tag %}
+    <p>No books match those filters.</p>
+  {% else %}
+    <p>Your library is empty.</p>
+    <p><a class="button primary" href="{% url 'add' %}">Add your first book</a></p>
+  {% endif %}
+</div>
+{% endif %}

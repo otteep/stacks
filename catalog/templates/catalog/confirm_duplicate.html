@@ -1,0 +1,23 @@
+{% extends "catalog/base.html" %}
+{% block title %}Already owned · Stacks{% endblock %}
+{% block content %}
+<section class="narrow">
+  <h1>You already own this</h1>
+  <div class="card-row">
+    {% include "catalog/_cover.html" with book=book thumb=True %}
+    <div>
+      <p class="title">{{ book.title }}</p>
+      {% if book.authors %}<p class="author">{{ book.authors }}</p>{% endif %}
+      <p class="hint">{{ owned }} cop{{ owned|pluralize:"y,ies" }} in your library.</p>
+    </div>
+  </div>
+  <form method="post" action="{% url 'add' %}" class="stack">
+    {% csrf_token %}
+    <input type="hidden" name="isbn" value="{{ isbn }}">
+    <input type="hidden" name="location" value="{{ location }}">
+    <input type="hidden" name="add_duplicate" value="1">
+    <button type="submit" class="primary">Add another copy</button>
+    <a class="button" href="{% url 'add' %}">Cancel</a>
+  </form>
+</section>
+{% endblock %}

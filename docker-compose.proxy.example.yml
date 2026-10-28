@@ -1,0 +1,30 @@
+# Example: run Stacks on a shared Docker network behind a reverse proxy such as
+# Caddy. No ports are published; the proxy reaches the container by name.
+#
+# 1. Create the network once:      docker network create proxy-net
+# 2. Put your proxy on that network and add a site block, e.g. for Caddy:
+#
+#       books.example.com {
+#           reverse_proxy stacks:8000
+#       }
+#
+# 3. In .env set:
+#       STACKS_ALLOWED_HOSTS=books.example.com
+#       STACKS_CSRF_TRUSTED_ORIGINS=https://books.example.com
+#       STACKS_HTTPS=true
+services:
+  stacks:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - stacks_data:/data
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    external: true
+
+volumes:
+  stacks_data:

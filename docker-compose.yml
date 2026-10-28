@@ -1,0 +1,19 @@
+# Stacks: a self-hosted catalog of the physical books you own.
+#
+#   cp .env.example .env     # then edit it
+#   docker compose up -d
+#
+# This file builds the image locally. Behind a reverse proxy, see
+# docker-compose.proxy.example.yml.
+services:
+  stacks:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${STACKS_PORT:-8000}:8000"
+    volumes:
+      - stacks_data:/data
+
+volumes:
+  stacks_data:

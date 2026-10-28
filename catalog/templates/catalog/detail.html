@@ -1,0 +1,53 @@
+{% extends "catalog/base.html" %}
+{% block title %}{{ book.title }} · Stacks{% endblock %}
+{% block content %}
+<article class="detail">
+  <div class="detail-cover">{% include "catalog/_cover.html" with book=book %}</div>
+  <div class="detail-body">
+    <h1>{{ book.title }}</h1>
+    {% if book.subtitle %}<p class="subtitle">{{ book.subtitle }}</p>{% endif %}
+    {% if book.authors %}<p class="author">{{ book.authors }}</p>{% endif %}
+    {% if book.needs_review %}
+    <p class="notice">Details were incomplete when this was added.
+      <a href="{% url 'copy_edit' copy.pk %}">Fix them</a>
+      or <form method="post" action="{% url 'clear_review' book.pk %}" class="inline-form">{% csrf_token %}<button class="link-button">mark as checked</button></form>.</p>
+    {% endif %}
+
+    <dl class="facts">
+      {% if book.publisher %}<dt>Publisher</dt><dd>{{ book.publisher }}</dd>{% endif %}
+      {% if book.published_year %}<dt>Year</dt><dd>{{ book.published_year }}</dd>{% endif %}
+      {% if book.page_count %}<dt>Pages</dt><dd>{{ book.page_count }}</dd>{% endif %}
+      {% if book.language %}<dt>Language</dt><dd>{{ book.language }}</dd>{% endif %}
+      {% if book.isbn13 %}<dt>ISBN-13</dt><dd>{{ book.isbn13 }}</dd>{% endif %}
+      {% if book.isbn10 %}<dt>ISBN-10</dt><dd>{{ book.isbn10 }}</dd>{% endif %}
+    </dl>
+
+    <h2>Your copy</h2>
+    <dl class="facts">
+      <dt>Location</dt><dd>{{ copy.location|default:"—" }}</dd>
+      {% if copy.format %}<dt>Format</dt><dd>{{ copy.get_format_display }}</dd>{% endif %}
+      {% if copy.condition %}<dt>Condition</dt><dd>{{ copy.get_condition_display }}</dd>{% endif %}
+      {% if copy.acquired_on %}<dt>Acquired</dt><dd>{{ copy.acquired_on }}</dd>{% endif %}
+      {% if copy.price is not None %}<dt>Price paid</dt><dd>{{ copy.price }}</dd>{% endif %}
+      {% if copy.tags.all %}<dt>Tags</dt><dd>{% for t in copy.tags.all %}<a class="tag" href="{% url 'library' %}?tag={{ t.name|urlencode }}">{{ t.name }}</a> {% endfor %}</dd>{% endif %}
+      <dt>Added</dt><dd>{{ copy.created_at|date:"Y-m-d" }}</dd>
+    </dl>
+    {% if copy.notes %}<p class="notes">{{ copy.notes|linebreaksbr }}</p>{% endif %}
+
+    {% if sibling_copies %}
+    <p class="hint">You have {{ sibling_copies.count }} other cop{{ sibling_copies.count|pluralize:"y,ies" }} of this book:
+      {% for other in sibling_copies %}<a href="{{ other.get_absolute_url }}">{{ other.location|default:"no location" }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+    {% endif %}
+
+    {% if book.description %}
+    <details><summary>Description</summary><p>{{ book.description|linebreaksbr }}</p></details>
+    {% endif %}
+
+    <div class="actions">
+      <a class="button primary" href="{% url 'copy_edit' copy.pk %}">Edit</a>
+      <a class="button danger" href="{% url 'copy_delete' copy.pk %}">Remove</a>
+      <a class="button" href="{% url 'library' %}">Back to library</a>
+    </div>
+  </div>
+</article>
+{% endblock %}

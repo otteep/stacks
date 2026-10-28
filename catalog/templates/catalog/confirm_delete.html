@@ -1,0 +1,14 @@
+{% extends "catalog/base.html" %}
+{% block title %}Remove · Stacks{% endblock %}
+{% block content %}
+<section class="narrow">
+  <h1>Remove this copy?</h1>
+  <p><strong>{{ book.title }}</strong>{% if copy.location %} · {{ copy.location }}{% endif %}</p>
+  <p class="hint">This can’t be undone.{% if book.copies.count == 1 %} It’s your only copy, so the book’s record and cover will be removed too.{% endif %}</p>
+  <form method="post" class="actions">
+    {% csrf_token %}
+    <button type="submit" class="danger">Remove</button>
+    <a class="button" href="{% url 'copy_detail' copy.pk %}">Cancel</a>
+  </form>
+</section>
+{% endblock %}

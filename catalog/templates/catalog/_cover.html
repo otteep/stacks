@@ -1,0 +1,1 @@
+{% if book.has_cover %}<img class="cover" src="{% url 'cover' book.pk %}{% if thumb %}?thumb=1{% endif %}" alt="Cover of {{ book.title }}" loading="lazy">{% else %}<div class="cover placeholder" aria-hidden="true"><span>{{ book.title|truncatechars:40 }}</span></div>{% endif %}

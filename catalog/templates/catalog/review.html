@@ -1,0 +1,26 @@
+{% extends "catalog/base.html" %}
+{% block title %}Review queue · Stacks{% endblock %}
+{% block content %}
+<section>
+  <h1>Needs a quick check</h1>
+  <p class="hint">Books whose details couldn’t be found automatically, or were only partly found. Saving an edit clears the flag.</p>
+  {% if items %}
+  <ul class="books list">
+    {% for copy in items %}
+    <li>
+      <a class="book-link" href="{% url 'copy_edit' copy.pk %}">
+        {% include "catalog/_cover.html" with book=copy.book thumb=True %}
+        <div class="meta">
+          <span class="title">{{ copy.book.title }}</span>
+          {% if copy.book.authors %}<span class="author">{{ copy.book.authors }}</span>{% endif %}
+          <span class="details">{% if copy.book.isbn13 %}ISBN {{ copy.book.isbn13 }}{% endif %}{% if copy.location %} · {{ copy.location }}{% endif %}</span>
+        </div>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="empty"><p>Nothing to review. 🎉</p></div>
+  {% endif %}
+</section>
+{% endblock %}
