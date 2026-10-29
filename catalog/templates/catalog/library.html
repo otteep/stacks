@@ -1,6 +1,11 @@
 {% extends "catalog/base.html" %}
 {% block title %}Library · Stacks{% endblock %}
 {% block content %}
+<header class="page-header">
+  <p class="kicker">Catalog</p>
+  <h1>Library</h1>
+</header>
+
 <form id="filters" class="filters" method="get" action="{% url 'library' %}"
       hx-get="{% url 'library' %}" hx-target="#results" hx-push-url="true"
       hx-trigger="input changed delay:250ms from:#q, change from:select, submit">

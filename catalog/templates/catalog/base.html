@@ -3,13 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#2f5d50">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f5f0e8">
   <title>{% block title %}Stacks{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=EB+Garamond:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'catalog/stacks.css' %}">
   <script src="{% static 'catalog/htmx.min.js' %}" defer></script>
 </head>
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <div class="paper-texture" aria-hidden="true"></div>
   <header class="site-header">
     <a class="brand" href="{% url 'library' %}">Stacks</a>
     {% if user.is_authenticated %}

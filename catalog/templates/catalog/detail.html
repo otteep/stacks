@@ -1,36 +1,40 @@
 {% extends "catalog/base.html" %}
 {% block title %}{{ book.title }} · Stacks{% endblock %}
 {% block content %}
-<article class="detail">
-  <div class="detail-cover">{% include "catalog/_cover.html" with book=book %}</div>
-  <div class="detail-body">
+<article>
+  <header class="page-header">
+    <p class="kicker">Library</p>
     <h1>{{ book.title }}</h1>
     {% if book.subtitle %}<p class="subtitle">{{ book.subtitle }}</p>{% endif %}
     {% if book.authors %}<p class="author">{{ book.authors }}</p>{% endif %}
-    {% if book.needs_review %}
-    <p class="notice">Details were incomplete when this was added.
-      <a href="{% url 'copy_edit' copy.pk %}">Fix them</a>
-      or <form method="post" action="{% url 'clear_review' book.pk %}" class="inline-form">{% csrf_token %}<button class="link-button">mark as checked</button></form>.</p>
-    {% endif %}
-
+  </header>
+  {% if book.needs_review %}
+  <div class="notice">Details were incomplete when this was added.
+    <a href="{% url 'copy_edit' copy.pk %}">Fix them</a>
+    or <form method="post" action="{% url 'clear_review' book.pk %}" class="inline-form">{% csrf_token %}<button class="link-button">mark as checked</button></form>.
+  </div>
+  {% endif %}
+  <div class="detail">
+  <div class="detail-cover">{% include "catalog/_cover.html" with book=book %}</div>
+  <div class="detail-body">
     <dl class="facts">
-      {% if book.publisher %}<dt>Publisher</dt><dd>{{ book.publisher }}</dd>{% endif %}
-      {% if book.published_year %}<dt>Year</dt><dd>{{ book.published_year }}</dd>{% endif %}
-      {% if book.page_count %}<dt>Pages</dt><dd>{{ book.page_count }}</dd>{% endif %}
-      {% if book.language %}<dt>Language</dt><dd>{{ book.language }}</dd>{% endif %}
-      {% if book.isbn13 %}<dt>ISBN-13</dt><dd>{{ book.isbn13 }}</dd>{% endif %}
-      {% if book.isbn10 %}<dt>ISBN-10</dt><dd>{{ book.isbn10 }}</dd>{% endif %}
+      {% if book.publisher %}<div><dt>Publisher</dt><dd>{{ book.publisher }}</dd></div>{% endif %}
+      {% if book.published_year %}<div><dt>Year</dt><dd>{{ book.published_year }}</dd></div>{% endif %}
+      {% if book.page_count %}<div><dt>Pages</dt><dd>{{ book.page_count }}</dd></div>{% endif %}
+      {% if book.language %}<div><dt>Language</dt><dd>{{ book.language }}</dd></div>{% endif %}
+      {% if book.isbn13 %}<div><dt>ISBN-13</dt><dd>{{ book.isbn13 }}</dd></div>{% endif %}
+      {% if book.isbn10 %}<div><dt>ISBN-10</dt><dd>{{ book.isbn10 }}</dd></div>{% endif %}
     </dl>
 
     <h2>Your copy</h2>
     <dl class="facts">
-      <dt>Location</dt><dd>{{ copy.location|default:"—" }}</dd>
-      {% if copy.format %}<dt>Format</dt><dd>{{ copy.get_format_display }}</dd>{% endif %}
-      {% if copy.condition %}<dt>Condition</dt><dd>{{ copy.get_condition_display }}</dd>{% endif %}
-      {% if copy.acquired_on %}<dt>Acquired</dt><dd>{{ copy.acquired_on }}</dd>{% endif %}
-      {% if copy.price is not None %}<dt>Price paid</dt><dd>{{ copy.price }}</dd>{% endif %}
-      {% if copy.tags.all %}<dt>Tags</dt><dd>{% for t in copy.tags.all %}<a class="tag" href="{% url 'library' %}?tag={{ t.name|urlencode }}">{{ t.name }}</a> {% endfor %}</dd>{% endif %}
-      <dt>Added</dt><dd>{{ copy.created_at|date:"Y-m-d" }}</dd>
+      <div><dt>Location</dt><dd>{{ copy.location|default:"—" }}</dd></div>
+      {% if copy.format %}<div><dt>Format</dt><dd>{{ copy.get_format_display }}</dd></div>{% endif %}
+      {% if copy.condition %}<div><dt>Condition</dt><dd>{{ copy.get_condition_display }}</dd></div>{% endif %}
+      {% if copy.acquired_on %}<div><dt>Acquired</dt><dd>{{ copy.acquired_on }}</dd></div>{% endif %}
+      {% if copy.price is not None %}<div><dt>Price paid</dt><dd>{{ copy.price }}</dd></div>{% endif %}
+      {% if copy.tags.all %}<div><dt>Tags</dt><dd>{% for t in copy.tags.all %}<a class="tag" href="{% url 'library' %}?tag={{ t.name|urlencode }}">{{ t.name }}</a>{% endfor %}</dd></div>{% endif %}
+      <div><dt>Added</dt><dd>{{ copy.created_at|date:"Y-m-d" }}</dd></div>
     </dl>
     {% if copy.notes %}<p class="notes">{{ copy.notes|linebreaksbr }}</p>{% endif %}
 
@@ -48,6 +52,7 @@
       <a class="button danger" href="{% url 'copy_delete' copy.pk %}">Remove</a>
       <a class="button" href="{% url 'library' %}">Back to library</a>
     </div>
+  </div>
   </div>
 </article>
 {% endblock %}
