@@ -3,6 +3,7 @@ from django import forms
 from .models import Book, Copy, Tag
 from .services import covers, isbn as isbn_utils
 from .services.sortkeys import author_sort_key
+from .themes import iter_themes
 
 
 class IsbnForm(forms.Form):
@@ -116,3 +117,11 @@ class CopyForm(forms.ModelForm):
             existing = Tag.objects.filter(name__iexact=name).first()
             tags.append(existing or Tag.objects.create(name=name[:50]))
         copy.tags.set(tags)
+
+
+class ThemeForm(forms.Form):
+    theme = forms.ChoiceField(error_messages={"invalid_choice": "That theme isn’t available."})
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["theme"].choices = [(theme.id, theme.label) for theme in iter_themes()]

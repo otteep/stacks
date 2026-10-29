@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
@@ -119,3 +120,20 @@ class Copy(models.Model):
 
     def get_absolute_url(self):
         return reverse("copy_detail", args=[self.pk])
+
+
+class UserSettings(models.Model):
+    """Per-account preferences. One row, created the first time a setting is saved."""
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="catalog_settings",
+    )
+    theme = models.CharField(max_length=40, default="paper")
+
+    class Meta:
+        verbose_name_plural = "user settings"
+
+    def __str__(self):
+        return f"Settings for {self.user}"

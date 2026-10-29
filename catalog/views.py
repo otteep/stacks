@@ -9,15 +9,22 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from django.conf import settings
 
-from .forms import BookForm, CopyForm, IsbnForm
-from .models import Book, Copy, Tag
+from .forms import BookForm, CopyForm, IsbnForm, ThemeForm
+from .models import Book, Copy, Tag, UserSettings
 from .services import books as book_service
 from .services import covers
 from .services.sortkeys import fold
+from .themes import get_theme, iter_themes
+
+# Settings is a tabbed page. A new section is a new entry here plus a branch
+# in catalog/templates/catalog/settings.html.
+SETTINGS_TABS = (
+    ("themes", "Themes"),
+)
 
 # sort key -> (label, order_by fields). A trailing "?" marks a nullable column,
 # which always sorts nulls last. Only the first field flips for descending order;
@@ -275,3 +282,31 @@ def _csv_safe(value):
 
 def healthz(request):
     return HttpResponse("ok", content_type="text/plain")
+
+
+def _active_tab(requested: str | None) -> str:
+    tab_ids = {tab_id for tab_id, _label in SETTINGS_TABS}
+    if requested in tab_ids:
+        return requested
+    return SETTINGS_TABS[0][0]
+
+
+@require_http_methods(["GET", "POST"])
+def settings_page(request):
+    active_tab = _active_tab(request.POST.get("tab") if request.method == "POST" else request.GET.get("tab"))
+    saved_theme = UserSettings.objects.filter(user=request.user).values_list("theme", flat=True).first()
+    if request.method == "POST" and active_tab == "themes":
+        form = ThemeForm(request.POST)
+        if form.is_valid():
+            chosen = get_theme(form.cleaned_data["theme"])
+            UserSettings.objects.update_or_create(user=request.user, defaults={"theme": chosen.id})
+            messages.success(request, f"{chosen.label} is now the theme.")
+            return redirect(f"{reverse('settings')}?tab=themes")
+    else:
+        form = ThemeForm(initial={"theme": get_theme(saved_theme).id})
+    return render(request, "catalog/settings.html", {
+        "settings_tabs": SETTINGS_TABS,
+        "active_tab": active_tab,
+        "theme_form": form,
+        "themes": iter_themes(),
+    })

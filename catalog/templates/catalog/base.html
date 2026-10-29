@@ -1,10 +1,10 @@
 {% load static %}<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="{{ active_theme.id }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#f5f0e8">
+  <meta name="color-scheme" content="{{ active_theme.color_scheme }}">
+  <meta name="theme-color" content="{{ active_theme.background }}">
   <title>{% block title %}Stacks{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,6 +21,7 @@
       <a href="{% url 'library' %}" {% if request.resolver_match.url_name == 'library' %}aria-current="page"{% endif %}>Library</a>
       <a href="{% url 'add' %}" {% if request.resolver_match.url_name == 'add' %}aria-current="page"{% endif %}>Add</a>
       <a href="{% url 'review' %}" {% if request.resolver_match.url_name == 'review' %}aria-current="page"{% endif %}>Review</a>
+      <a href="{% url 'settings' %}" {% if request.resolver_match.url_name == 'settings' %}aria-current="page"{% endif %}>Settings</a>
       <form method="post" action="{% url 'logout' %}" class="inline-form">
         {% csrf_token %}<button type="submit" class="link-button">Log out</button>
       </form>
