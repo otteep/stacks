@@ -11,8 +11,9 @@ from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from catalog.models import Book, Copy, Tag
+from catalog.models import Book, Copy, Tag, UserSettings
 from catalog.services import covers
+from catalog.themes import Theme, THEMES
 
 from .test_services import png_bytes
 
@@ -36,7 +37,7 @@ class AuthTests(TestCase):
     def test_every_page_requires_login(self):
         for name, args in [
             ("library", []), ("add", []), ("add_manual", []), ("review", []),
-            ("export", []), ("copy_detail", [1]), ("copy_edit", [1]), ("cover", [1]),
+            ("settings", []), ("export", []), ("copy_detail", [1]), ("copy_edit", [1]), ("cover", [1]),
         ]:
             response = self.client.get(reverse(name, args=args))
             self.assertEqual(response.status_code, 302, name)
@@ -62,6 +63,56 @@ class AuthTests(TestCase):
         get_user_model().objects.create_user("u", password="pw-12345678")
         response = self.client.post(reverse("login"), {"username": "u", "password": "pw-12345678"})
         self.assertRedirects(response, reverse("library"))
+
+
+class SettingsTests(BaseViewTest):
+    def test_themes_tab_lists_the_paper_theme(self):
+        response = self.client.get(reverse("settings"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Themes")
+        self.assertContains(response, "Paper")
+        self.assertContains(response, 'value="paper" checked')
+        self.assertContains(response, 'data-theme="paper"')
+        self.assertContains(response, 'aria-current="page"')
+
+    def test_unknown_tab_falls_back_to_themes(self):
+        response = self.client.get(reverse("settings"), {"tab": "nope"})
+        self.assertContains(response, 'href="/settings/?tab=themes" aria-current="page"')
+
+    def test_saving_paper_persists_and_applies(self):
+        response = self.client.post(reverse("settings"), {"tab": "themes", "theme": "paper"})
+        self.assertRedirects(response, reverse("settings") + "?tab=themes")
+        self.assertEqual(UserSettings.objects.get(user=self.user).theme, "paper")
+        page = self.client.get(reverse("library"))
+        self.assertContains(page, '<html lang="en" data-theme="paper">')
+        self.assertContains(page, 'content="#f5f0e8"')
+
+    def test_unknown_theme_is_rejected(self):
+        response = self.client.post(reverse("settings"), {"tab": "themes", "theme": "nope"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "isn’t available")
+        self.assertFalse(UserSettings.objects.filter(user=self.user).exists())
+
+    def test_a_registered_theme_can_be_selected(self):
+        ink = Theme(
+            id="ink",
+            label="Ink",
+            description="A dark ground.",
+            background="#17150f",
+            color_scheme="dark",
+        )
+        with mock.patch("catalog.themes.THEMES", (*THEMES, ink)):
+            response = self.client.post(reverse("settings"), {"tab": "themes", "theme": "ink"})
+            self.assertRedirects(response, reverse("settings") + "?tab=themes")
+            page = self.client.get(reverse("library"))
+        self.assertContains(page, 'data-theme="ink"')
+        self.assertContains(page, 'content="#17150f"')
+        self.assertContains(page, 'content="dark"')
+
+    def test_a_removed_theme_falls_back_to_the_default(self):
+        UserSettings.objects.create(user=self.user, theme="retired")
+        response = self.client.get(reverse("library"))
+        self.assertContains(response, 'data-theme="paper"')
 
 
 class LibraryTests(BaseViewTest):

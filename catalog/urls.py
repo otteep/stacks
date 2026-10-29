@@ -12,6 +12,7 @@ urlpatterns = [
     path("review/", views.review_queue, name="review"),
     path("review/<int:pk>/clear/", views.clear_review, name="clear_review"),
     path("covers/<int:book_id>/", views.cover, name="cover"),
+    path("settings/", views.settings_page, name="settings"),
     path("export.csv", views.export_csv, name="export"),
     path("healthz", views.healthz, name="healthz"),
 ]

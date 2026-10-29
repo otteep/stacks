@@ -1,0 +1,39 @@
+{% extends "catalog/base.html" %}
+{% block title %}Settings · Stacks{% endblock %}
+{% block content %}
+<header class="page-header">
+  <p class="kicker">Account</p>
+  <h1>Settings</h1>
+</header>
+
+<nav class="settings-tabs" aria-label="Settings">
+  {% for tab_id, label in settings_tabs %}
+  <a href="{% url 'settings' %}?tab={{ tab_id }}" {% if tab_id == active_tab %}aria-current="page"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</nav>
+
+{% if active_tab == "themes" %}
+<form method="post" action="{% url 'settings' %}" class="theme-form">
+  {% csrf_token %}
+  <input type="hidden" name="tab" value="themes">
+  {{ theme_form.theme.errors }}
+  <div class="theme-list">
+    {% for theme in themes %}
+    <label class="theme-card">
+      <input type="radio" name="theme" value="{{ theme.id }}" {% if theme_form.theme.value == theme.id %}checked{% endif %}>
+      <span class="theme-swatch" data-theme="{{ theme.id }}" aria-hidden="true">
+        <span class="swatch-kicker">Theme</span>
+        <span class="swatch-title">Aa</span>
+      </span>
+      <span class="theme-card-name">{{ theme.label }}</span>
+      <span class="theme-card-desc">{{ theme.description }}</span>
+      <span class="theme-status">In use</span>
+    </label>
+    {% endfor %}
+  </div>
+  <div class="actions">
+    <button type="submit" class="primary">Save theme</button>
+  </div>
+</form>
+{% endif %}
+{% endblock %}
