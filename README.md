@@ -24,7 +24,7 @@ questions like *"do I already own this?"* and *"which shelf is it on?"*
 - CSV export (respects your current filters)
 - Private by default: every page requires login, there is no signup, and covers
   are served through the login too
-- Works with a USB/Bluetooth barcode scanner (it just types the ISBN and presses Enter)
+- Scan a barcode with the phone camera on the Add page (needs HTTPS), or with a USB/Bluetooth scanner (it types the ISBN and presses Enter)
 
 ## Quick start
 
@@ -49,7 +49,7 @@ swap the named volume for a bind mount, make that directory writable by it
 
 ## Behind a reverse proxy (HTTPS)
 
-Secure cookies (and, later, camera access) need HTTPS, so in practice you'll put
+Secure cookies and camera access need HTTPS, so in practice you'll put
 Stacks behind a proxy. See `docker-compose.proxy.example.yml`. With Caddy:
 
 ```
@@ -112,7 +112,7 @@ python manage.py test
 - **Single library.** Every account sees the same collection; there are no per-user libraries.
 - Search is substring matching, which is plenty for personal-sized libraries
   (thousands of books) but isn't ranked full-text search.
-- No camera scanning, bulk CSV import, or wishlist/lending tracking yet.
+- No bulk CSV import or wishlist/lending tracking yet.
 - Metadata quality is whatever Open Library and Google Books return. Pre-1970 books
   and small presses often have gaps, which is what the review queue and manual
   editing are for.

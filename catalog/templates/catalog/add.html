@@ -1,18 +1,27 @@
 {% extends "catalog/base.html" %}
+{% load static %}
 {% block title %}Add a book · Stacks{% endblock %}
 {% block content %}
 <section class="narrow">
   <h1>Add a book</h1>
-  <p class="hint">Type an ISBN, or scan it with a USB/Bluetooth barcode scanner (it types the number and presses Enter).
+  <p class="hint">Type an ISBN, scan it with the phone camera, or use a USB/Bluetooth barcode scanner (it types the number and presses Enter).
     The shelf location sticks between books, so you can work through one shelf at a time.</p>
 
-  <form method="post" class="stack" autocomplete="off">
+  <form id="add-form" method="post" class="stack" autocomplete="off">
     {% csrf_token %}
     {{ form.non_field_errors }}
-    <label>ISBN
-      {{ form.isbn }}
-      {% for error in form.isbn.errors %}<span class="error">{{ error }}</span>{% endfor %}
-    </label>
+    <div class="isbn-row">
+      <label for="id_isbn">ISBN
+        {{ form.isbn }}
+        {% for error in form.isbn.errors %}<span class="error">{{ error }}</span>{% endfor %}
+      </label>
+      <button type="button" id="scan-open" class="scan-open" data-zxing="{% static 'catalog/zxing.min.js' %}">Scan</button>
+    </div>
+    <div id="scan-panel" class="scan-panel" hidden>
+      <video id="scan-video" class="scan-video" playsinline autoplay muted aria-label="Barcode camera preview"></video>
+      <p id="scan-status" class="scan-status" role="status"></p>
+      <button type="button" id="scan-cancel">Cancel</button>
+    </div>
     <label>Shelf / location
       <input type="text" name="location" value="{{ form.location.value|default_if_none:'' }}" maxlength="200"
              list="location-options" placeholder="e.g. Study, bookcase 2, shelf 3">
@@ -23,4 +32,7 @@
 
   <p class="alt"><a href="{% url 'add_manual' %}">No ISBN? Add it manually →</a></p>
 </section>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'catalog/scan.js' %}" defer></script>
 {% endblock %}

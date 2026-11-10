@@ -844,3 +844,31 @@ label.theme-card:has(input:focus-visible) {
   visibility: hidden;
 }
 label.theme-card:has(input:checked) .theme-status { visibility: visible; }
+
+/* phone barcode scan */
+.isbn-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: end;
+}
+.scan-open { white-space: nowrap; }
+.scan-panel { margin-top: 12px; }
+.scan-video {
+  display: block;
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  background: var(--text-primary);
+  border: 1px solid var(--border);
+}
+.scan-status {
+  min-height: 1.2em;
+  margin: 8px 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--text-secondary);
+}
+.scan-panel button { margin-top: 2px; }
