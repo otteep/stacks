@@ -203,6 +203,13 @@ class LibraryTests(BaseViewTest):
 
 
 class AddFlowTests(BaseViewTest):
+    def test_add_page_offers_camera_scan(self):
+        response = self.client.get(reverse("add"))
+        self.assertContains(response, 'id="scan-open"')
+        self.assertContains(response, 'id="scan-video"')
+        self.assertContains(response, "catalog/scan.js")
+        self.assertContains(response, "catalog/zxing.min.js")
+
     @mock.patch("catalog.services.books.covers.download", return_value=None)
     @mock.patch("catalog.services.lookup._get_json", return_value=None)
     def test_add_remembers_location_and_flags_misses(self, *_):
